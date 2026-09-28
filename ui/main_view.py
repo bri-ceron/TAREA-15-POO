@@ -5,59 +5,55 @@ from pathlib import Path
 
 class MainView:
 
-    def __init__(self, root, servicio, usuario, cerrar_sesion):
+    def __init__(
+        self,
+        root,
+        servicio,
+        usuario,
+        cerrar_sesion
+    ):
 
         self.root = root
         self.servicio = servicio
         self.usuario = usuario
         self.cerrar_sesion = cerrar_sesion
 
-        self.root.title("SULTAN RESTAURANT - TURKISH BBQ")
-        self.root.geometry("1200x720")
-        self.root.resizable(True, True)
+        self.root.title(
+            "SULTAN RESTAURANT - TURKISH BBQ"
+        )
 
-        # ==========================================
-        # RUTAS
-        # ==========================================
+        self.root.geometry(
+            "1200x720"
+        )
 
-        base = Path(__file__).resolve().parent.parent
+        self.root.minsize(
+            1000,
+            650
+        )
 
-        ruta_logo = base / "assets" / "logo.png"
-        ruta_icono = base / "assets" / "icono.png"
+        self.logo = None
+        self.icono = None
 
-        # ==========================================
-        # LOGO
-        # ==========================================
+        base = Path(
+            __file__
+        ).resolve().parent.parent
+
+        assets = base / "assets"
 
         try:
 
             self.logo = tk.PhotoImage(
-                file=ruta_logo
+                file=assets / "logo.png"
             )
-
-            # Reducir el logo para que no quede gigante
-            while (
-                self.logo.width() > 180
-                or self.logo.height() > 100
-            ):
-
-                self.logo = self.logo.subsample(
-                    2,
-                    2
-                )
 
         except Exception:
 
             self.logo = None
 
-        # ==========================================
-        # ICONO
-        # ==========================================
-
         try:
 
             self.icono = tk.PhotoImage(
-                file=ruta_icono
+                file=assets / "icono.png"
             )
 
             self.root.iconphoto(
@@ -69,78 +65,54 @@ class MainView:
 
             self.icono = None
 
-        # ==========================================
-        # ESTILOS
-        # ==========================================
-
         self.configurar_estilos()
-
-        # ==========================================
-        # INTERFAZ
-        # ==========================================
-
         self.crear_interfaz()
 
-    # =================================================
+        self.mostrar_inicio()
+
+    # ==========================================================
     # ESTILOS
-    # =================================================
+    # ==========================================================
 
     def configurar_estilos(self):
 
         estilo = ttk.Style()
 
         try:
-            estilo.theme_use("clam")
+
+            estilo.theme_use(
+                "clam"
+            )
+
         except Exception:
+
             pass
 
         estilo.configure(
             "Treeview",
             font=("Arial", 10),
-            rowheight=30,
-            background="white",
-            fieldbackground="white"
+            rowheight=30
         )
 
         estilo.configure(
             "Treeview.Heading",
-            font=("Arial", 10, "bold"),
-            background="#E5E7EB",
-            foreground="#333333"
+            font=("Arial", 10, "bold")
         )
 
-        estilo.map(
-            "Treeview",
-            background=[
-                ("selected", "#65C020")
-            ],
-            foreground=[
-                ("selected", "white")
-            ]
+        estilo.configure(
+            "TCombobox",
+            padding=5,
+            font=("Arial", 10)
         )
 
-    # =================================================
-    # INTERFAZ PRINCIPAL
-    # =================================================
+    # ==========================================================
+    # INTERFAZ
+    # ==========================================================
 
     def crear_interfaz(self):
 
-        contenedor = tk.Frame(
-            self.root,
-            bg="#F4F4F4"
-        )
-
-        contenedor.pack(
-            expand=True,
-            fill="both"
-        )
-
-        # ==========================================
-        # PANEL IZQUIERDO
-        # ==========================================
-
         self.menu = tk.Frame(
-            contenedor,
+            self.root,
             bg="#CFDDDA",
             width=290
         )
@@ -150,82 +122,109 @@ class MainView:
             fill="y"
         )
 
-        self.menu.pack_propagate(False)
+        self.menu.pack_propagate(
+            False
+        )
 
-        # ==========================================
+        self.contenido = tk.Frame(
+            self.root,
+            bg="#F4F4F4"
+        )
+
+        self.contenido.pack(
+            side="right",
+            fill="both",
+            expand=True
+        )
+
         # LOGO
-        # ==========================================
 
-        zona_logo = tk.Frame(
+        self.logo_frame = tk.Frame(
             self.menu,
             bg="#F5EEDC",
             height=125
         )
 
-        zona_logo.pack(
-            fill="x",
-            pady=(15, 0)
+        self.logo_frame.pack(
+            fill="x"
         )
 
-        zona_logo.pack_propagate(False)
+        self.logo_frame.pack_propagate(
+            False
+        )
 
         if self.logo:
 
-            etiqueta_logo = tk.Label(
-                zona_logo,
-                image=self.logo,
+            logo_mostrar = self.logo
+
+            try:
+
+                while (
+                    logo_mostrar.width() > 180
+                    or
+                    logo_mostrar.height() > 100
+                ):
+
+                    logo_mostrar = (
+                        logo_mostrar.subsample(
+                            2,
+                            2
+                        )
+                    )
+
+            except Exception:
+
+                pass
+
+            self.logo_label = tk.Label(
+                self.logo_frame,
+                image=logo_mostrar,
                 bg="#F5EEDC"
             )
 
-            etiqueta_logo.pack(
-                expand=True
+            self.logo_label.image = logo_mostrar
+
+            self.logo_label.pack(
+                pady=8
             )
 
-        # ==========================================
-        # NOMBRE DEL RESTAURANTE
-        # ==========================================
+        # NOMBRE
 
-        nombre = tk.Label(
+        tk.Label(
             self.menu,
             text="SULTAN RESTAURANT",
-            font=("Arial", 16, "bold"),
+            bg="#D7D6E0",
             fg="#3B2F2F",
-            bg="#D7D6E0"
+            font=("Arial", 16, "bold")
+        ).pack(
+            fill="x"
         )
 
-        nombre.pack(
-            pady=(5, 0)
-        )
-
-        subtitulo = tk.Label(
+        tk.Label(
             self.menu,
             text="TURKISH BBQ",
-            font=("Arial", 12, "bold"),
+            bg="#F5EEDC",
             fg="#AA0BB8",
-            bg="#F5EEDC"
+            font=("Arial", 12, "bold")
+        ).pack(
+            fill="x",
+            pady=(0, 10)
         )
-
-        subtitulo.pack(
-            pady=(0, 20)
-        )
-
-        # ==========================================
-        # LINEA DECORATIVA
-        # ==========================================
 
         tk.Frame(
             self.menu,
             bg="#C49A3A",
-            height=2
+            height=3
         ).pack(
             fill="x",
             padx=20,
-            pady=(0, 20)
+            pady=(0, 15)
         )
 
-        # ==========================================
-        # BOTONES
-        # ==========================================
+        self.crear_boton_menu(
+            "INICIO",
+            self.mostrar_inicio
+        )
 
         self.crear_boton_menu(
             "USUARIOS",
@@ -242,61 +241,35 @@ class MainView:
             self.mostrar_ventas
         )
 
-        # ==========================================
-        # ESPACIO
-        # ==========================================
-
         tk.Frame(
             self.menu,
-            bg="#F5EEDC"
+            bg="#CFDDDA"
         ).pack(
+            fill="both",
             expand=True
         )
 
-        # ==========================================
-        # CERRAR SESIÓN
-        # ==========================================
-
-        boton_cerrar = tk.Button(
+        tk.Button(
             self.menu,
             text="CERRAR SESIÓN",
-            font=("Arial", 11, "bold"),
+            command=self.cerrar_sesion,
             bg="#52B474",
             fg="white",
             activebackground="#A91414",
             activeforeground="white",
+            font=("Arial", 10, "bold"),
             relief="flat",
             cursor="hand2",
-            command=self.cerrar_sesion
-        )
-
-        boton_cerrar.pack(
+            height=2
+        ).pack(
             fill="x",
             padx=20,
-            pady=20,
-            ipady=10
+            pady=20
         )
 
-        # ==========================================
-        # PANEL DERECHO
-        # ==========================================
-
-        self.panel = tk.Frame(
-            contenedor,
-            bg="#F4F4F4"
-        )
-
-        self.panel.pack(
-            side="right",
-            expand=True,
-            fill="both"
-        )
-
-        self.mostrar_inicio()
-
-    # =================================================
-    # BOTONES DEL MENU
-    # =================================================
+    # ==========================================================
+    # BOTÓN MENÚ
+    # ==========================================================
 
     def crear_boton_menu(
         self,
@@ -304,273 +277,242 @@ class MainView:
         comando
     ):
 
-        boton = tk.Button(
+        tk.Button(
             self.menu,
             text=texto,
-            font=("Arial", 11, "bold"),
-            bg="#E8D8B5",
+            command=comando,
+            bg="#CFDDDA",
             fg="#3B2F2F",
-            activebackground="#C49A3A",
-            activeforeground="white",
+            activebackground="#B7C9C5",
+            activeforeground="#3B2F2F",
+            font=("Arial", 11, "bold"),
             relief="flat",
             cursor="hand2",
-            command=comando
-        )
-
-        boton.pack(
+            height=2
+        ).pack(
             fill="x",
             padx=20,
-            pady=5,
-            ipady=10
+            pady=4
         )
 
-    # =================================================
-    # LIMPIAR PANEL DERECHO
-    # =================================================
+    # ==========================================================
+    # LIMPIAR CONTENIDO
+    # ==========================================================
 
-    def limpiar_panel(self):
+    def limpiar_contenido(self):
 
-        for widget in self.panel.winfo_children():
+        for widget in self.contenido.winfo_children():
 
-            try:
-                widget.destroy()
-            except tk.TclError:
-                pass
+            widget.destroy()
 
-    # =================================================
+        # Eliminamos referencias a tablas antiguas
+        if hasattr(
+            self,
+            "tabla_usuarios"
+        ):
+
+            del self.tabla_usuarios
+
+        if hasattr(
+            self,
+            "tabla_productos"
+        ):
+
+            del self.tabla_productos
+
+        if hasattr(
+            self,
+            "tabla_ventas"
+        ):
+
+            del self.tabla_ventas
+
+    # ==========================================================
     # INICIO
-    # =================================================
+    # ==========================================================
 
     def mostrar_inicio(self):
 
-        self.limpiar_panel()
+        self.limpiar_contenido()
 
-        titulo = tk.Label(
-            self.panel,
+        tk.Label(
+            self.contenido,
             text="Panel principal",
-            font=("Arial", 26, "bold"),
             bg="#F4F4F4",
-            fg="#3B2F2F"
+            fg="#3B2F2F",
+            font=("Arial", 24, "bold")
+        ).pack(
+            pady=(35, 5)
         )
 
-        titulo.pack(
-            anchor="w",
-            padx=35,
-            pady=(40, 5)
-        )
-
-        subtitulo = tk.Label(
-            self.panel,
-            text=(
-                "Consulte usuarios, gestione productos "
-                "y registre ventas desde el menú lateral."
-            ),
-            font=("Arial", 11),
+        tk.Label(
+            self.contenido,
+            text="Bienvenida a SULTAN RESTAURANT - TURKISH BBQ",
             bg="#F4F4F4",
-            fg="#666666"
+            fg="#666666",
+            font=("Arial", 12)
+        ).pack(
+            pady=(0, 30)
         )
 
-        subtitulo.pack(
-            anchor="w",
-            padx=35
-        )
-
-        # ==========================================
-        # TARJETAS
-        # ==========================================
-
-        tarjetas = tk.Frame(
-            self.panel,
+        contenedor = tk.Frame(
+            self.contenido,
             bg="#F4F4F4"
         )
 
-        tarjetas.pack(
-            fill="x",
-            padx=30,
-            pady=30
-        )
+        contenedor.pack()
 
         self.crear_tarjeta(
-            tarjetas,
-            "Usuarios registrados",
+            contenedor,
+            "USUARIOS",
             len(self.servicio.usuarios),
-            "#2563EB"
+            "#4A90E2",
+            0
         )
 
         self.crear_tarjeta(
-            tarjetas,
-            "Productos registrados",
+            contenedor,
+            "PRODUCTOS",
             len(self.servicio.productos),
-            "#16A34A"
+            "#52B474",
+            1
         )
 
         self.crear_tarjeta(
-            tarjetas,
-            "Ventas registradas",
+            contenedor,
+            "VENTAS",
             len(self.servicio.ventas),
-            "#D97706"
+            "#F39C12",
+            2
         )
 
-    # =================================================
+    # ==========================================================
     # TARJETAS
-    # =================================================
+    # ==========================================================
 
     def crear_tarjeta(
         self,
         padre,
         titulo,
-        valor,
-        color
+        cantidad,
+        color,
+        columna
     ):
 
         tarjeta = tk.Frame(
             padre,
             bg="white",
-            bd=1,
-            relief="solid"
+            width=220,
+            height=150,
+            relief="solid",
+            bd=1
         )
 
-        tarjeta.pack(
-            side="left",
-            expand=True,
-            fill="both",
-            padx=7,
-            ipady=15
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=15
+        )
+
+        tarjeta.grid_propagate(
+            False
         )
 
         tk.Label(
             tarjeta,
             text=titulo,
-            font=("Arial", 10, "bold"),
             bg="white",
-            fg="#555555"
+            fg=color,
+            font=("Arial", 13, "bold")
         ).pack(
-            pady=(15, 0)
+            pady=(25, 8)
         )
 
         tk.Label(
             tarjeta,
-            text=str(valor),
-            font=("Arial", 25, "bold"),
+            text=str(cantidad),
             bg="white",
-            fg=color
-        ).pack(
-            pady=5
-        )
+            fg="#333333",
+            font=("Arial", 28, "bold")
+        ).pack()
 
-    # =================================================
-    # ENCABEZADO
-    # =================================================
-
-    def crear_encabezado(
-        self,
-        titulo,
-        descripcion
-    ):
-
-        encabezado = tk.Frame(
-            self.panel,
-            bg="#F4F4F4"
-        )
-
-        encabezado.pack(
-            fill="x",
-            padx=35,
-            pady=(25, 5)
-        )
-
-        tk.Label(
-            encabezado,
-            text=titulo,
-            font=("Arial", 25, "bold"),
-            bg="#F4F4F4",
-            fg="#3B2F2F"
-        ).pack(
-            anchor="w"
-        )
-
-        tk.Label(
-            encabezado,
-            text=descripcion,
-            font=("Arial", 10),
-            bg="#F4F4F4",
-            fg="#666666"
-        ).pack(
-            anchor="w",
-            pady=(5, 0)
-        )
-
-    # =================================================
+    # ==========================================================
     # USUARIOS
-    # =================================================
+    # ==========================================================
 
     def mostrar_usuarios(self):
 
-        self.limpiar_panel()
+        self.limpiar_contenido()
 
-        self.crear_encabezado(
-            "USUARIOS",
-            "Gestión y consulta de usuarios registrados."
+        tk.Label(
+            self.contenido,
+            text="Gestión de Usuarios",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 22, "bold")
+        ).pack(
+            pady=(25, 15)
         )
 
         botones = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="#F4F4F4"
         )
 
         botones.pack(
-            pady=10
+            pady=(0, 15)
         )
 
         self.crear_boton_accion(
             botones,
             "REGISTRAR",
-            "#16A34A",
-            self.registrar_usuario
+            "#52B474",
+            self.registrar_usuario,
+            0
         )
 
         self.crear_boton_accion(
             botones,
             "CONSULTAR",
-            "#2563EB",
-            self.consultar_usuarios
+            "#4A90E2",
+            self.consultar_usuarios,
+            1
         )
 
         self.crear_boton_accion(
             botones,
             "ACTUALIZAR",
-            "#D97706",
-            self.actualizar_usuario
+            "#F39C12",
+            self.actualizar_usuario,
+            2
         )
 
         self.crear_boton_accion(
             botones,
             "ELIMINAR",
-            "#DC2626",
-            self.eliminar_usuario
+            "#D9534F",
+            self.eliminar_usuario,
+            3
         )
 
         self.crear_boton_accion(
             botones,
             "LIMPIAR",
-            "#6B7280",
-            self.limpiar_tabla
+            "#777777",
+            self.limpiar_tabla,
+            4
         )
 
-        # ==========================================
-        # TABLA
-        # ==========================================
-
         tabla_frame = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="#F4F4F4"
         )
 
         tabla_frame.pack(
-            expand=True,
             fill="both",
+            expand=True,
             padx=30,
-            pady=15
+            pady=10
         )
 
         columnas = (
@@ -602,29 +544,44 @@ class MainView:
 
         self.tabla_usuarios.column(
             "identificacion",
-            width=170
+            width=180,
+            anchor="center"
         )
 
         self.tabla_usuarios.column(
             "nombre",
-            width=280
+            width=300,
+            anchor="center"
         )
 
         self.tabla_usuarios.column(
             "usuario",
-            width=180
+            width=220,
+            anchor="center"
+        )
+
+        scrollbar = ttk.Scrollbar(
+            tabla_frame,
+            orient="vertical",
+            command=self.tabla_usuarios.yview
+        )
+
+        self.tabla_usuarios.configure(
+            yscrollcommand=scrollbar.set
         )
 
         self.tabla_usuarios.pack(
-            expand=True,
-            fill="both"
+            side="left",
+            fill="both",
+            expand=True
+        )
+
+        scrollbar.pack(
+            side="right",
+            fill="y"
         )
 
         self.cargar_usuarios()
-
-    # =================================================
-    # CARGAR USUARIOS
-    # =================================================
 
     def cargar_usuarios(self):
 
@@ -632,19 +589,20 @@ class MainView:
             self,
             "tabla_usuarios"
         ):
+
             return
 
-        try:
+        if not self.tabla_usuarios.winfo_exists():
+
+            return
+
+        for item in self.tabla_usuarios.get_children():
 
             self.tabla_usuarios.delete(
-                *self.tabla_usuarios.get_children()
+                item
             )
 
-        except tk.TclError:
-
-            return
-
-        for usuario in self.servicio.usuarios:
+        for usuario in self.servicio.listar_usuarios():
 
             self.tabla_usuarios.insert(
                 "",
@@ -656,73 +614,474 @@ class MainView:
                 )
             )
 
-    # =================================================
+    def consultar_usuarios(self):
+
+        self.cargar_usuarios()
+
+        messagebox.showinfo(
+            "Consulta",
+            f"Usuarios registrados: "
+            f"{len(self.servicio.usuarios)}"
+        )
+
+    # ==========================================================
+    # REGISTRAR USUARIO
+    # ==========================================================
+
+    def registrar_usuario(self):
+
+        ventana = tk.Toplevel(
+            self.root
+        )
+
+        ventana.title(
+            "Registrar usuario"
+        )
+
+        ventana.geometry(
+            "430x430"
+        )
+
+        ventana.resizable(
+            False,
+            False
+        )
+
+        ventana.configure(
+            bg="#F4F4F4"
+        )
+
+        ventana.transient(
+            self.root
+        )
+
+        ventana.grab_set()
+
+        tk.Label(
+            ventana,
+            text="REGISTRAR USUARIO",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 18, "bold")
+        ).pack(
+            pady=20
+        )
+
+        campos = {}
+
+        datos = [
+            ("ID / CÉDULA", "identificacion"),
+            ("NOMBRE", "nombre"),
+            ("USUARIO", "usuario"),
+            ("CONTRASEÑA", "contrasena")
+        ]
+
+        for texto, clave in datos:
+
+            tk.Label(
+                ventana,
+                text=texto,
+                bg="#F4F4F4",
+                fg="#333333",
+                font=("Arial", 10, "bold")
+            ).pack(
+                anchor="w",
+                padx=40,
+                pady=(5, 2)
+            )
+
+            entrada = tk.Entry(
+                ventana,
+                font=("Arial", 11),
+                width=35
+            )
+
+            if clave == "contrasena":
+
+                entrada.config(
+                    show="*"
+                )
+
+            entrada.pack(
+                padx=40,
+                pady=(0, 5)
+            )
+
+            campos[clave] = entrada
+
+        def guardar():
+
+            try:
+
+                self.servicio.registrar_usuario(
+                    campos["identificacion"].get(),
+                    campos["nombre"].get(),
+                    campos["usuario"].get(),
+                    campos["contrasena"].get()
+                )
+
+                ventana.destroy()
+
+                self.cargar_usuarios()
+
+                messagebox.showinfo(
+                    "Éxito",
+                    "Usuario registrado correctamente."
+                )
+
+            except ValueError as error:
+
+                messagebox.showerror(
+                    "Error",
+                    str(error),
+                    parent=ventana
+                )
+
+        tk.Button(
+            ventana,
+            text="GUARDAR",
+            command=guardar,
+            bg="#52B474",
+            fg="white",
+            font=("Arial", 10, "bold"),
+            relief="flat",
+            cursor="hand2",
+            width=18,
+            height=2
+        ).pack(
+            pady=20
+        )
+
+    # ==========================================================
+    # ACTUALIZAR USUARIO
+    # ==========================================================
+
+    def actualizar_usuario(self):
+
+        if not hasattr(
+            self,
+            "tabla_usuarios"
+        ):
+
+            return
+
+        seleccion = (
+            self.tabla_usuarios.selection()
+        )
+
+        if not seleccion:
+
+            messagebox.showwarning(
+                "Actualizar",
+                "Seleccione un usuario de la tabla."
+            )
+
+            return
+
+        valores = self.tabla_usuarios.item(
+            seleccion[0],
+            "values"
+        )
+
+        identificacion = valores[0]
+
+        usuario_obj = (
+            self.servicio.buscar_usuario(
+                identificacion
+            )
+        )
+
+        if usuario_obj is None:
+
+            messagebox.showerror(
+                "Error",
+                "No se encontró el usuario."
+            )
+
+            return
+
+        ventana = tk.Toplevel(
+            self.root
+        )
+
+        ventana.title(
+            "Actualizar usuario"
+        )
+
+        ventana.geometry(
+            "430x430"
+        )
+
+        ventana.resizable(
+            False,
+            False
+        )
+
+        ventana.configure(
+            bg="#F4F4F4"
+        )
+
+        ventana.grab_set()
+
+        tk.Label(
+            ventana,
+            text="ACTUALIZAR USUARIO",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 18, "bold")
+        ).pack(
+            pady=20
+        )
+
+        campos = {}
+
+        datos = [
+            (
+                "ID / CÉDULA",
+                "identificacion",
+                usuario_obj.identificacion
+            ),
+            (
+                "NOMBRE",
+                "nombre",
+                usuario_obj.nombre
+            ),
+            (
+                "USUARIO",
+                "usuario",
+                usuario_obj.usuario
+            ),
+            (
+                "CONTRASEÑA",
+                "contrasena",
+                usuario_obj.contrasena
+            )
+        ]
+
+        for texto, clave, valor in datos:
+
+            tk.Label(
+                ventana,
+                text=texto,
+                bg="#F4F4F4",
+                fg="#333333",
+                font=("Arial", 10, "bold")
+            ).pack(
+                anchor="w",
+                padx=40,
+                pady=(5, 2)
+            )
+
+            entrada = tk.Entry(
+                ventana,
+                font=("Arial", 11),
+                width=35
+            )
+
+            entrada.insert(
+                0,
+                str(valor)
+            )
+
+            if clave == "contrasena":
+
+                entrada.config(
+                    show="*"
+                )
+
+            entrada.pack(
+                padx=40,
+                pady=(0, 5)
+            )
+
+            campos[clave] = entrada
+
+        def guardar():
+
+            try:
+
+                self.servicio.actualizar_usuario(
+                    identificacion,
+                    campos["identificacion"].get(),
+                    campos["nombre"].get(),
+                    campos["usuario"].get(),
+                    campos["contrasena"].get()
+                )
+
+                ventana.destroy()
+
+                self.cargar_usuarios()
+
+                messagebox.showinfo(
+                    "Éxito",
+                    "Usuario actualizado correctamente."
+                )
+
+            except ValueError as error:
+
+                messagebox.showerror(
+                    "Error",
+                    str(error),
+                    parent=ventana
+                )
+
+        tk.Button(
+            ventana,
+            text="GUARDAR CAMBIOS",
+            command=guardar,
+            bg="#F39C12",
+            fg="white",
+            font=("Arial", 10, "bold"),
+            relief="flat",
+            cursor="hand2",
+            width=20,
+            height=2
+        ).pack(
+            pady=20
+        )
+
+    # ==========================================================
+    # ELIMINAR USUARIO
+    # ==========================================================
+
+    def eliminar_usuario(self):
+
+        if not hasattr(
+            self,
+            "tabla_usuarios"
+        ):
+
+            return
+
+        seleccion = (
+            self.tabla_usuarios.selection()
+        )
+
+        if not seleccion:
+
+            messagebox.showwarning(
+                "Eliminar",
+                "Seleccione un usuario de la tabla."
+            )
+
+            return
+
+        valores = self.tabla_usuarios.item(
+            seleccion[0],
+            "values"
+        )
+
+        identificacion = valores[0]
+        nombre = valores[1]
+
+        confirmar = messagebox.askyesno(
+            "Confirmar",
+            f"¿Desea eliminar al usuario?\n\n"
+            f"{nombre}\n"
+            f"ID: {identificacion}"
+        )
+
+        if not confirmar:
+
+            return
+
+        try:
+
+            self.servicio.eliminar_usuario(
+                identificacion
+            )
+
+            self.cargar_usuarios()
+
+            messagebox.showinfo(
+                "Éxito",
+                "Usuario eliminado correctamente."
+            )
+
+        except ValueError as error:
+
+            messagebox.showerror(
+                "Error",
+                str(error)
+            )
+
+    # ==========================================================
     # PRODUCTOS
-    # =================================================
+    # ==========================================================
 
     def mostrar_productos(self):
 
-        self.limpiar_panel()
+        self.limpiar_contenido()
 
-        self.crear_encabezado(
-            "PRODUCTOS",
-            "Gestión y consulta de productos del restaurante."
+        tk.Label(
+            self.contenido,
+            text="Gestión de Productos",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 22, "bold")
+        ).pack(
+            pady=(25, 15)
         )
 
         botones = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="#F4F4F4"
         )
 
         botones.pack(
-            pady=10
+            pady=(0, 15)
         )
 
         self.crear_boton_accion(
             botones,
             "REGISTRAR",
-            "#16A34A",
-            self.registrar_producto
+            "#52B474",
+            self.registrar_producto,
+            0
         )
 
         self.crear_boton_accion(
             botones,
             "CONSULTAR",
-            "#2563EB",
-            self.consultar_productos
+            "#4A90E2",
+            self.consultar_productos,
+            1
         )
 
         self.crear_boton_accion(
             botones,
             "ACTUALIZAR",
-            "#D97706",
-            self.actualizar_producto
+            "#F39C12",
+            self.actualizar_producto,
+            2
         )
 
         self.crear_boton_accion(
             botones,
             "ELIMINAR",
-            "#DC2626",
-            self.eliminar_producto
+            "#D9534F",
+            self.eliminar_producto,
+            3
         )
 
         self.crear_boton_accion(
             botones,
             "LIMPIAR",
-            "#6B7280",
-            self.limpiar_tabla
+            "#777777",
+            self.limpiar_tabla,
+            4
         )
 
         tabla_frame = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="#F4F4F4"
         )
 
         tabla_frame.pack(
-            expand=True,
             fill="both",
-            padx=25,
-            pady=15
+            expand=True,
+            padx=30,
+            pady=10
         )
 
         columnas = (
@@ -742,7 +1101,7 @@ class MainView:
 
         encabezados = {
             "codigo": "CÓDIGO",
-            "nombre": "PRODUCTO",
+            "nombre": "NOMBRE",
             "precio": "PRECIO",
             "categoria": "CATEGORÍA",
             "stock": "STOCK",
@@ -758,44 +1117,62 @@ class MainView:
 
         self.tabla_productos.column(
             "codigo",
-            width=90
+            width=100,
+            anchor="center"
         )
 
         self.tabla_productos.column(
             "nombre",
-            width=220
+            width=230,
+            anchor="center"
         )
 
         self.tabla_productos.column(
             "precio",
-            width=100
+            width=100,
+            anchor="center"
         )
 
         self.tabla_productos.column(
             "categoria",
-            width=160
+            width=180,
+            anchor="center"
         )
 
         self.tabla_productos.column(
             "stock",
-            width=80
+            width=90,
+            anchor="center"
         )
 
         self.tabla_productos.column(
             "estado",
-            width=130
+            width=120,
+            anchor="center"
+        )
+
+        scrollbar = ttk.Scrollbar(
+            tabla_frame,
+            orient="vertical",
+            command=self.tabla_productos.yview
+        )
+
+        self.tabla_productos.configure(
+            yscrollcommand=scrollbar.set
         )
 
         self.tabla_productos.pack(
-            expand=True,
-            fill="both"
+            side="left",
+            fill="both",
+            expand=True
+        )
+
+        scrollbar.pack(
+            side="right",
+            fill="y"
         )
 
         self.cargar_productos()
-
-    # =================================================
-    # CARGAR PRODUCTOS
-    # =================================================
 
     def cargar_productos(self):
 
@@ -803,19 +1180,20 @@ class MainView:
             self,
             "tabla_productos"
         ):
+
             return
 
-        try:
+        if not self.tabla_productos.winfo_exists():
+
+            return
+
+        for item in self.tabla_productos.get_children():
 
             self.tabla_productos.delete(
-                *self.tabla_productos.get_children()
+                item
             )
 
-        except tk.TclError:
-
-            return
-
-        for producto in self.servicio.productos:
+        for producto in self.servicio.listar_productos():
 
             self.tabla_productos.insert(
                 "",
@@ -830,122 +1208,502 @@ class MainView:
                 )
             )
 
-    # =================================================
+    def consultar_productos(self):
+
+        self.cargar_productos()
+
+        messagebox.showinfo(
+            "Consulta",
+            f"Productos registrados: "
+            f"{len(self.servicio.productos)}"
+        )
+
+    # ==========================================================
+    # REGISTRAR PRODUCTO
+    # ==========================================================
+
+    def registrar_producto(self):
+
+        ventana = tk.Toplevel(
+            self.root
+        )
+
+        ventana.title(
+            "Registrar producto"
+        )
+
+        ventana.geometry(
+            "430x500"
+        )
+
+        ventana.resizable(
+            False,
+            False
+        )
+
+        ventana.configure(
+            bg="#F4F4F4"
+        )
+
+        ventana.grab_set()
+
+        tk.Label(
+            ventana,
+            text="REGISTRAR PRODUCTO",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 18, "bold")
+        ).pack(
+            pady=20
+        )
+
+        campos = {}
+
+        datos = [
+            ("CÓDIGO", "codigo"),
+            ("NOMBRE", "nombre"),
+            ("PRECIO", "precio"),
+            ("CATEGORÍA", "categoria"),
+            ("STOCK", "stock")
+        ]
+
+        for texto, clave in datos:
+
+            tk.Label(
+                ventana,
+                text=texto,
+                bg="#F4F4F4",
+                fg="#333333",
+                font=("Arial", 10, "bold")
+            ).pack(
+                anchor="w",
+                padx=40,
+                pady=(5, 2)
+            )
+
+            entrada = tk.Entry(
+                ventana,
+                font=("Arial", 11),
+                width=35
+            )
+
+            entrada.pack(
+                padx=40,
+                pady=(0, 5)
+            )
+
+            campos[clave] = entrada
+
+        def guardar():
+
+            try:
+
+                self.servicio.registrar_producto(
+                    campos["codigo"].get(),
+                    campos["nombre"].get(),
+                    campos["precio"].get(),
+                    campos["categoria"].get(),
+                    campos["stock"].get()
+                )
+
+                ventana.destroy()
+
+                self.cargar_productos()
+
+                messagebox.showinfo(
+                    "Éxito",
+                    "Producto registrado correctamente."
+                )
+
+            except ValueError as error:
+
+                messagebox.showerror(
+                    "Error",
+                    str(error),
+                    parent=ventana
+                )
+
+        tk.Button(
+            ventana,
+            text="GUARDAR",
+            command=guardar,
+            bg="#52B474",
+            fg="white",
+            font=("Arial", 10, "bold"),
+            relief="flat",
+            cursor="hand2",
+            width=18,
+            height=2
+        ).pack(
+            pady=20
+        )
+
+    # ==========================================================
+    # ACTUALIZAR PRODUCTO
+    # ==========================================================
+
+    def actualizar_producto(self):
+
+        if not hasattr(
+            self,
+            "tabla_productos"
+        ):
+
+            return
+
+        seleccion = (
+            self.tabla_productos.selection()
+        )
+
+        if not seleccion:
+
+            messagebox.showwarning(
+                "Actualizar",
+                "Seleccione un producto de la tabla."
+            )
+
+            return
+
+        valores = self.tabla_productos.item(
+            seleccion[0],
+            "values"
+        )
+
+        codigo = valores[0]
+
+        producto_obj = (
+            self.servicio.buscar_producto(
+                codigo
+            )
+        )
+
+        if producto_obj is None:
+
+            messagebox.showerror(
+                "Error",
+                "No se encontró el producto."
+            )
+
+            return
+
+        ventana = tk.Toplevel(
+            self.root
+        )
+
+        ventana.title(
+            "Actualizar producto"
+        )
+
+        ventana.geometry(
+            "430x500"
+        )
+
+        ventana.resizable(
+            False,
+            False
+        )
+
+        ventana.configure(
+            bg="#F4F4F4"
+        )
+
+        ventana.grab_set()
+
+        tk.Label(
+            ventana,
+            text="ACTUALIZAR PRODUCTO",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 18, "bold")
+        ).pack(
+            pady=20
+        )
+
+        campos = {}
+
+        datos = [
+            (
+                "CÓDIGO",
+                "codigo",
+                producto_obj.codigo
+            ),
+            (
+                "NOMBRE",
+                "nombre",
+                producto_obj.nombre
+            ),
+            (
+                "PRECIO",
+                "precio",
+                producto_obj.precio
+            ),
+            (
+                "CATEGORÍA",
+                "categoria",
+                producto_obj.categoria
+            ),
+            (
+                "STOCK",
+                "stock",
+                producto_obj.stock
+            )
+        ]
+
+        for texto, clave, valor in datos:
+
+            tk.Label(
+                ventana,
+                text=texto,
+                bg="#F4F4F4",
+                fg="#333333",
+                font=("Arial", 10, "bold")
+            ).pack(
+                anchor="w",
+                padx=40,
+                pady=(5, 2)
+            )
+
+            entrada = tk.Entry(
+                ventana,
+                font=("Arial", 11),
+                width=35
+            )
+
+            entrada.insert(
+                0,
+                str(valor)
+            )
+
+            entrada.pack(
+                padx=40,
+                pady=(0, 5)
+            )
+
+            campos[clave] = entrada
+
+        def guardar():
+
+            try:
+
+                self.servicio.actualizar_producto(
+                    codigo,
+                    campos["codigo"].get(),
+                    campos["nombre"].get(),
+                    campos["precio"].get(),
+                    campos["categoria"].get(),
+                    campos["stock"].get()
+                )
+
+                ventana.destroy()
+
+                self.cargar_productos()
+
+                messagebox.showinfo(
+                    "Éxito",
+                    "Producto actualizado correctamente."
+                )
+
+            except ValueError as error:
+
+                messagebox.showerror(
+                    "Error",
+                    str(error),
+                    parent=ventana
+                )
+
+        tk.Button(
+            ventana,
+            text="GUARDAR CAMBIOS",
+            command=guardar,
+            bg="#F39C12",
+            fg="white",
+            font=("Arial", 10, "bold"),
+            relief="flat",
+            cursor="hand2",
+            width=20,
+            height=2
+        ).pack(
+            pady=20
+        )
+
+    # ==========================================================
+    # ELIMINAR PRODUCTO
+    # ==========================================================
+
+    def eliminar_producto(self):
+
+        if not hasattr(
+            self,
+            "tabla_productos"
+        ):
+
+            return
+
+        seleccion = (
+            self.tabla_productos.selection()
+        )
+
+        if not seleccion:
+
+            messagebox.showwarning(
+                "Eliminar",
+                "Seleccione un producto de la tabla."
+            )
+
+            return
+
+        valores = self.tabla_productos.item(
+            seleccion[0],
+            "values"
+        )
+
+        codigo = valores[0]
+        nombre = valores[1]
+
+        confirmar = messagebox.askyesno(
+            "Confirmar",
+            f"¿Desea eliminar el producto?\n\n"
+            f"{nombre}\n"
+            f"Código: {codigo}"
+        )
+
+        if not confirmar:
+
+            return
+
+        try:
+
+            self.servicio.eliminar_producto(
+                codigo
+            )
+
+            self.cargar_productos()
+
+            messagebox.showinfo(
+                "Éxito",
+                "Producto eliminado correctamente."
+            )
+
+        except ValueError as error:
+
+            messagebox.showerror(
+                "Error",
+                str(error)
+            )
+
+    # ==========================================================
     # VENTAS
-    # =================================================
+    # ==========================================================
 
     def mostrar_ventas(self):
 
-        self.limpiar_panel()
+        self.limpiar_contenido()
 
-        self.crear_encabezado(
-            "VENTAS",
-            "Registre y consulte las ventas realizadas."
+        tk.Label(
+            self.contenido,
+            text="Gestión de Ventas",
+            bg="#F4F4F4",
+            fg="#3B2F2F",
+            font=("Arial", 22, "bold")
+        ).pack(
+            pady=(25, 15)
         )
 
-        # ==========================================
-        # FORMULARIO
-        # ==========================================
-
         formulario = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="white",
-            bd=1,
-            relief="solid"
+            relief="solid",
+            bd=1
         )
 
         formulario.pack(
             fill="x",
-            padx=35,
+            padx=30,
             pady=10
         )
 
         tk.Label(
             formulario,
-            text="USUARIO / CÉDULA:",
-            font=("Arial", 10, "bold"),
+            text="USUARIO / CÉDULA",
             bg="white",
-            fg="#3B2F2F"
+            fg="#3B2F2F",
+            font=("Arial", 10, "bold")
         ).grid(
             row=0,
             column=0,
-            padx=10,
-            pady=15
+            padx=15,
+            pady=(15, 5),
+            sticky="w"
         )
 
         self.combo_usuario = ttk.Combobox(
             formulario,
             state="readonly",
-            width=28
+            width=35
         )
 
         self.combo_usuario.grid(
-            row=0,
-            column=1,
-            padx=10
+            row=1,
+            column=0,
+            padx=15,
+            pady=(0, 15)
         )
 
         tk.Label(
             formulario,
-            text="PRODUCTO:",
-            font=("Arial", 10, "bold"),
+            text="PRODUCTO",
             bg="white",
-            fg="#3B2F2F"
+            fg="#3B2F2F",
+            font=("Arial", 10, "bold")
         ).grid(
             row=0,
-            column=2,
-            padx=10
+            column=1,
+            padx=15,
+            pady=(15, 5),
+            sticky="w"
         )
 
         self.combo_producto = ttk.Combobox(
             formulario,
             state="readonly",
-            width=35
+            width=45
         )
 
         self.combo_producto.grid(
-            row=0,
-            column=3,
-            padx=10
+            row=1,
+            column=1,
+            padx=15,
+            pady=(0, 15)
         )
 
-        boton = tk.Button(
+        tk.Button(
             formulario,
             text="REGISTRAR VENTA",
-            font=("Arial", 10, "bold"),
-            bg="#16A34A",
+            command=self.registrar_venta,
+            bg="#52B474",
             fg="white",
-            activebackground="#15803D",
-            activeforeground="white",
+            font=("Arial", 10, "bold"),
             relief="flat",
             cursor="hand2",
-            command=self.registrar_venta
-        )
-
-        boton.grid(
-            row=0,
-            column=4,
+            width=20,
+            height=2
+        ).grid(
+            row=1,
+            column=2,
             padx=15,
-            pady=10,
-            ipady=6
+            pady=(0, 15)
         )
-
-        self.cargar_combos()
-
-        # ==========================================
-        # TABLA DE VENTAS
-        # ==========================================
 
         tabla_frame = tk.Frame(
-            self.panel,
+            self.contenido,
             bg="#F4F4F4"
         )
 
         tabla_frame.pack(
-            expand=True,
             fill="both",
-            padx=35,
-            pady=15
+            expand=True,
+            padx=30,
+            pady=10
         )
 
         columnas = (
@@ -963,8 +1721,8 @@ class MainView:
         )
 
         encabezados = {
-            "id": "ID VENTA",
-            "cedula": "CÉDULA / ID",
+            "id": "ID",
+            "cedula": "CÉDULA",
             "usuario": "USUARIO",
             "producto": "PRODUCTO",
             "fecha": "FECHA"
@@ -977,59 +1735,42 @@ class MainView:
                 text=encabezados[columna]
             )
 
-        self.tabla_ventas.column(
-            "id",
-            width=80
+        for columna in columnas:
+
+            self.tabla_ventas.column(
+                columna,
+                anchor="center"
+            )
+
+        scrollbar = ttk.Scrollbar(
+            tabla_frame,
+            orient="vertical",
+            command=self.tabla_ventas.yview
         )
 
-        self.tabla_ventas.column(
-            "cedula",
-            width=150
-        )
-
-        self.tabla_ventas.column(
-            "usuario",
-            width=180
-        )
-
-        self.tabla_ventas.column(
-            "producto",
-            width=230
-        )
-
-        self.tabla_ventas.column(
-            "fecha",
-            width=180
+        self.tabla_ventas.configure(
+            yscrollcommand=scrollbar.set
         )
 
         self.tabla_ventas.pack(
-            expand=True,
-            fill="both"
+            side="left",
+            fill="both",
+            expand=True
         )
 
+        scrollbar.pack(
+            side="right",
+            fill="y"
+        )
+
+        self.cargar_combos_ventas()
         self.actualizar_ventas()
 
-    # =================================================
-    # CARGAR COMBOS
-    # =================================================
-
-    def cargar_combos(self):
-
-        if not hasattr(
-            self,
-            "combo_usuario"
-        ):
-            return
-
-        if not hasattr(
-            self,
-            "combo_producto"
-        ):
-            return
+    def cargar_combos_ventas(self):
 
         usuarios = []
 
-        for usuario in self.servicio.usuarios:
+        for usuario in self.servicio.listar_usuarios():
 
             usuarios.append(
                 f"{usuario.identificacion} - "
@@ -1040,7 +1781,7 @@ class MainView:
 
         productos = []
 
-        for producto in self.servicio.productos:
+        for producto in self.servicio.listar_productos():
 
             if producto.disponible:
 
@@ -1053,149 +1794,61 @@ class MainView:
 
         self.combo_producto["values"] = productos
 
-    # =================================================
-    # REGISTRAR VENTA
-    # =================================================
+        self.combo_usuario.set("")
+        self.combo_producto.set("")
 
     def registrar_venta(self):
 
-        usuario_seleccionado = (
-            self.combo_usuario.get()
-        )
+        usuario = self.combo_usuario.get().strip()
+        producto = self.combo_producto.get().strip()
 
-        producto_seleccionado = (
-            self.combo_producto.get()
-        )
-
-        if not usuario_seleccionado:
+        if not usuario:
 
             messagebox.showwarning(
-                "Datos incompletos",
+                "Venta",
                 "Seleccione un usuario."
             )
 
             return
 
-        if not producto_seleccionado:
+        if not producto:
 
             messagebox.showwarning(
-                "Datos incompletos",
+                "Venta",
                 "Seleccione un producto."
             )
 
             return
 
-        # ==========================================
-        # OBTENER CÉDULA
-        # ==========================================
+        cedula = usuario.split(
+            " - "
+        )[0]
 
-        cedula = (
-            usuario_seleccionado
-            .split(" - ", 1)[0]
-        )
-
-        # ==========================================
-        # OBTENER CÓDIGO
-        # ==========================================
-
-        codigo = (
-            producto_seleccionado
-            .split(" - ", 1)[0]
-        )
+        codigo = producto.split(
+            " - "
+        )[0]
 
         try:
 
-            resultado = self.servicio.registrar_venta(
+            self.servicio.registrar_venta(
                 cedula,
                 codigo
             )
 
-            # ======================================
-            # COMPATIBLE CON RESULTADO DICCIONARIO
-            # ======================================
-
-            if isinstance(
-                resultado,
-                dict
-            ):
-
-                if not resultado.get(
-                    "ok",
-                    False
-                ):
-
-                    messagebox.showwarning(
-                        "No se pudo registrar",
-                        resultado.get(
-                            "mensaje",
-                            "No se pudo registrar la venta."
-                        )
-                    )
-
-                    return
-
-                venta = resultado.get(
-                    "venta"
-                )
-
-            else:
-
-                venta = resultado
-
-            # ======================================
-            # ACTUALIZAR SOLO LA VISTA DE VENTAS
-            # ======================================
-
             self.actualizar_ventas()
+            self.cargar_combos_ventas()
 
-            # Actualizar productos disponibles
-            # del ComboBox
-            self.cargar_combos()
-
-            # ======================================
-            # LIMPIAR SELECCIÓN
-            # ======================================
-
-            self.combo_usuario.set("")
-            self.combo_producto.set("")
-
-            # ======================================
-            # MENSAJE
-            # ======================================
-
-            if venta is not None:
-
-                id_venta = getattr(
-                    venta,
-                    "id",
-                    "N/A"
-                )
-
-                messagebox.showinfo(
-                    "Venta registrada",
-                    "¡Venta registrada correctamente!\n\n"
-                    f"ID de venta: {id_venta}\n"
-                    f"Cédula: {cedula}\n"
-                    f"Producto: {codigo}"
-                )
-
-            else:
-
-                messagebox.showinfo(
-                    "Venta registrada",
-                    "¡Venta registrada correctamente!"
-                )
-
-        except Exception as error:
-
-            messagebox.showerror(
-                "Error al registrar venta",
-                str(error)
+            messagebox.showinfo(
+                "Éxito",
+                "Venta registrada correctamente."
             )
 
-    # =================================================
-    # ACTUALIZAR VENTAS
-    # =================================================
+        except ValueError as error:
+
+            messagebox.showerror(
+                "Error",
+                str(error)
+            )
 
     def actualizar_ventas(self):
 
@@ -1203,160 +1856,92 @@ class MainView:
             self,
             "tabla_ventas"
         ):
+
             return
 
-        try:
+        if not self.tabla_ventas.winfo_exists():
+
+            return
+
+        for item in self.tabla_ventas.get_children():
 
             self.tabla_ventas.delete(
-                *self.tabla_ventas.get_children()
+                item
             )
 
-        except tk.TclError:
+        for venta in self.servicio.listar_ventas():
 
-            return
-
-        for venta in self.servicio.ventas:
-
-            usuario = (
-                self.servicio.buscar_usuario(
-                    venta.usuario_id
-                )
+            usuario = self.servicio.buscar_usuario(
+                venta.usuario_id
             )
 
-            producto = (
-                self.servicio.buscar_producto(
-                    venta.producto_codigo
-                )
+            producto = self.servicio.buscar_producto(
+                venta.producto_codigo
             )
 
             nombre_usuario = (
                 usuario.nombre
                 if usuario
-                else "Desconocido"
+                else "Usuario eliminado"
             )
 
             nombre_producto = (
                 producto.nombre
                 if producto
-                else "Desconocido"
+                else "Producto eliminado"
             )
 
-            try:
-
-                self.tabla_ventas.insert(
-                    "",
-                    "end",
-                    values=(
-                        venta.id,
-                        venta.usuario_id,
-                        nombre_usuario,
-                        nombre_producto,
-                        venta.fecha
-                    )
+            self.tabla_ventas.insert(
+                "",
+                "end",
+                values=(
+                    venta.id,
+                    venta.usuario_id,
+                    nombre_usuario,
+                    nombre_producto,
+                    venta.fecha
                 )
+            )
 
-            except tk.TclError:
-
-                return
-
-    # =================================================
-    # BOTONES DE ACCIONES
-    # =================================================
+    # ==========================================================
+    # BOTONES DE ACCIÓN
+    # ==========================================================
 
     def crear_boton_accion(
         self,
         padre,
         texto,
         color,
-        comando
+        comando,
+        columna
     ):
 
-        boton = tk.Button(
+        tk.Button(
             padre,
             text=texto,
-            font=("Arial", 9, "bold"),
+            command=comando,
             bg=color,
             fg="white",
             activebackground=color,
             activeforeground="white",
+            font=("Arial", 9, "bold"),
             relief="flat",
             cursor="hand2",
-            command=comando
+            width=13,
+            height=2
+        ).grid(
+            row=0,
+            column=columna,
+            padx=5
         )
 
-        boton.pack(
-            side="left",
-            padx=5,
-            ipadx=10,
-            ipady=7
-        )
-
-    # =================================================
-    # USUARIOS
-    # =================================================
-
-    def consultar_usuarios(self):
-
-        self.cargar_usuarios()
-
-    def registrar_usuario(self):
-
-        messagebox.showinfo(
-            "Registrar usuario",
-            "La opción de registrar usuarios "
-            "está disponible para implementar."
-        )
-
-    def actualizar_usuario(self):
-
-        messagebox.showinfo(
-            "Actualizar usuario",
-            "Seleccione un usuario para actualizar."
-        )
-
-    def eliminar_usuario(self):
-
-        messagebox.showinfo(
-            "Eliminar usuario",
-            "Seleccione un usuario para eliminar."
-        )
-
-    # =================================================
-    # PRODUCTOS
-    # =================================================
-
-    def consultar_productos(self):
-
-        self.cargar_productos()
-
-    def registrar_producto(self):
-
-        messagebox.showinfo(
-            "Registrar producto",
-            "La opción de registrar productos "
-            "está disponible para implementar."
-        )
-
-    def actualizar_producto(self):
-
-        messagebox.showinfo(
-            "Actualizar producto",
-            "Seleccione un producto para actualizar."
-        )
-
-    def eliminar_producto(self):
-
-        messagebox.showinfo(
-            "Eliminar producto",
-            "Seleccione un producto para eliminar."
-        )
-
-    # =================================================
-    # LIMPIAR TABLAS
-    # =================================================
+    # ==========================================================
+    # LIMPIAR TABLA
+    # ==========================================================
 
     def limpiar_tabla(self):
 
+        # USUARIOS
         if hasattr(
             self,
             "tabla_usuarios"
@@ -1364,13 +1949,23 @@ class MainView:
 
             try:
 
-                self.tabla_usuarios.delete(
-                    *self.tabla_usuarios.get_children()
-                )
+                if self.tabla_usuarios.winfo_exists():
+
+                    for item in (
+                        self.tabla_usuarios.get_children()
+                    ):
+
+                        self.tabla_usuarios.delete(
+                            item
+                        )
+
+                    return
 
             except tk.TclError:
+
                 pass
 
+        # PRODUCTOS
         if hasattr(
             self,
             "tabla_productos"
@@ -1378,13 +1973,23 @@ class MainView:
 
             try:
 
-                self.tabla_productos.delete(
-                    *self.tabla_productos.get_children()
-                )
+                if self.tabla_productos.winfo_exists():
+
+                    for item in (
+                        self.tabla_productos.get_children()
+                    ):
+
+                        self.tabla_productos.delete(
+                            item
+                        )
+
+                    return
 
             except tk.TclError:
+
                 pass
 
+        # VENTAS
         if hasattr(
             self,
             "tabla_ventas"
@@ -1392,9 +1997,18 @@ class MainView:
 
             try:
 
-                self.tabla_ventas.delete(
-                    *self.tabla_ventas.get_children()
-                )
+                if self.tabla_ventas.winfo_exists():
+
+                    for item in (
+                        self.tabla_ventas.get_children()
+                    ):
+
+                        self.tabla_ventas.delete(
+                            item
+                        )
+
+                    return
 
             except tk.TclError:
+
                 pass

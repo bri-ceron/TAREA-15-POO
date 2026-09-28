@@ -4,7 +4,7 @@
         "nombre": "Bandeja Familiar",
         "precio": 45.5,
         "categoria": "Plato Casa",
-        "stock": 3
+        "stock": 10
     },
     {
         "codigo": "0002",
@@ -18,7 +18,7 @@
         "nombre": "Ceviche De Camaron",
         "precio": 10.58,
         "categoria": "Plato Casa",
-        "stock": 13
+        "stock": 12
     },
     {
         "codigo": "0004",

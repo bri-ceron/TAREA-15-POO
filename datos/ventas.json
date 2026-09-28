@@ -46,5 +46,11 @@
         "usuario_id": "0804049104",
         "producto_codigo": "0004",
         "fecha": "2026-09-25 15:37:50"
+    },
+    {
+        "id": 9,
+        "usuario_id": "1234567891",
+        "producto_codigo": "0003",
+        "fecha": "2026-09-27 22:34:07"
     }
 ]
